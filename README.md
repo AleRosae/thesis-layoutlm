@@ -6,6 +6,7 @@ Experiments were carried out on two different public datasets: FUNSD and Kleiste
 The fine-tuned models were uploaded on the HuggingFace Hub and can be found at the following links:
 
 LayoutLMv1 - FUNSD: https://huggingface.co/Sennodipoi/LayoutLMv1-FUNSD-ft
+
 LayoutLMv2 - FUNSD: https://huggingface.co/Sennodipoi/LayoutLMv2-FUNSD-ft
 LayoutLMv3 - FUNSD: https://huggingface.co/Sennodipoi/LayoutLMv3-FUNSD-ft
 
