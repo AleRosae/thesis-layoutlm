@@ -136,7 +136,7 @@ test_dataset = FunsdDataset(args, tokenizer, labels, pad_token_label_id, mode="t
 test_sampler = SequentialSampler(test_dataset)
 test_dataloader = DataLoader(test_dataset,
                              sampler=test_sampler,
-                            batch_size=16)
+                            batch_size=8)
 
 def do_eval(model, dataloader_eval, device):
     eval_loss = 0.0

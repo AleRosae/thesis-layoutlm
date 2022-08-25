@@ -225,50 +225,47 @@ def train_layoutLM(model, epochs, dataloader_train, dataloader_eval, optimizer, 
         # forward + backward + optimize
         outputs = model(**batch) 
         loss = outputs.loss 
-        
 
         loss.backward()
-        
 
         optimizer.step()
 
-
         global_step += 1
 
-        if global_step % int((750 / batch_size)) == 0:
-          print(f"Loss after {global_step} steps: {loss.item()}")    
-          eval_results = do_eval(model, dataloader_eval) 
-          current_loss = eval_results['eval_loss']
-          #implementing early stopping
-          if current_loss > last_loss:
-              trigger_times += 1
-              print(f'Validation loss did not decrease from {last_loss}.')
-              print('Trigger Times:', trigger_times)
-              df = pd.DataFrame(final_results)
-              df.to_csv(f'results/v2/log_layoutLMv2_kleister-nda_run{run}.csv', index = False)
 
-              if trigger_times >= patience:
-                  print(f'Early stopping because validation loss did not decrease after {trigger_times} epochs.')
-                  print(f'Returning best model named: {best_model}')
-                  best_model = torch.load(best_model)
-                  df = pd.DataFrame(final_results)
-                  df.to_csv(f'results/v2/log_layoutLMv2_kleister-nda_run{run}.csv', index = False)
-                  return best_model
+    print(f"Loss after {epoch} epochs: {loss.item()}")    
+    eval_results = do_eval(model, dataloader_eval) 
+    current_loss = eval_results['eval_loss']
+    #implementing early stopping
+    if current_loss > last_loss:
+      trigger_times += 1
+      print(f'Validation loss did not decrease from {last_loss}.')
+      print('Trigger Times:', trigger_times)
+      df = pd.DataFrame(final_results)
+      df.to_csv(f'results/v2/log_layoutLMv2_kleister-nda_run{run}.csv', index = False)
 
-          else:
-              print(f'Validation loss decresed. Saving checkpoint...')
-              best_model = f'models/checkpointLMv2_epoch{epoch}.pt'
-              for ckpt in os.listdir('models'):
-                  if 'checkpointLMv2_epoch' in ckpt:
-                      os.remove(f'models/{ckpt}') #avoid too many checkpoints
-              torch.save(model, best_model)
-              trigger_times = 0
-              last_loss = current_loss
+      if trigger_times >= patience:
+          print(f'Early stopping because validation loss did not decrease after {trigger_times} epochs.')
+          print(f'Returning best model named: {best_model}')
+          best_model = torch.load(best_model)
+          df = pd.DataFrame(final_results)
+          df.to_csv(f'results/v2/log_layoutLMv2_kleister-nda_run{run}.csv', index = False)
+          return best_model
 
-          tmp = eval_results
-          tmp['steps'] =  global_step
-          tmp['train_loss'] =  loss.item()
-          final_results.append(tmp)
+    else:
+      print(f'Validation loss decresed. Saving checkpoint...')
+      best_model = f'models/checkpointLMv2_epoch{epoch}.pt'
+      for ckpt in os.listdir('models'):
+          if 'checkpointLMv2_epoch' in ckpt:
+              os.remove(f'models/{ckpt}') #avoid too many checkpoints
+      torch.save(model, best_model)
+      trigger_times = 0
+      last_loss = current_loss
+
+    tmp = eval_results
+    tmp['epoch'] =  global_step
+    tmp['train_loss'] =  loss.item()
+    final_results.append(tmp)
   df = pd.DataFrame(final_results)
   df.to_csv(f'results/v2/log_layoutLMv2_kleister-nda_run{run}.csv', index = False)
   best_model = torch.load(best_model)
@@ -279,9 +276,9 @@ if __name__ == '__main__':
                             patra dataset''')
 
     parser.add_argument('--batch_size', type=int, default=2, help='batch size for mapping function. Default is 2')
-    parser.add_argument('--lr', type=float, default = 4e-5, help='Learning rate for training. Default is 4e-5')
-    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs. Default is 25')
-    parser.add_argument('--patience', type=int, default=15, help='Patience. Default is 5')
+    parser.add_argument('--lr', type=float, default = 5e-5, help='Learning rate for training. Default is 4e-5')
+    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs. Default is 25')
+    parser.add_argument('--patience', type=int, default=10, help='Patience. Default is 5')
     parser.add_argument('--run', type=str, default=1, help='run id')
 
     args = parser.parse_args()
