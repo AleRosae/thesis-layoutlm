@@ -263,7 +263,7 @@ def train_layoutLM(model, epochs, dataloader_train, dataloader_eval, optimizer, 
       last_loss = current_loss
 
     tmp = eval_results
-    tmp['epoch'] =  global_step
+    tmp['epoch'] =  epoch
     tmp['train_loss'] =  loss.item()
     final_results.append(tmp)
   df = pd.DataFrame(final_results)
@@ -278,7 +278,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=2, help='batch size for mapping function. Default is 2')
     parser.add_argument('--lr', type=float, default = 5e-5, help='Learning rate for training. Default is 4e-5')
     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs. Default is 25')
-    parser.add_argument('--patience', type=int, default=10, help='Patience. Default is 5')
+    parser.add_argument('--patience', type=int, default=12, help='Patience. Default is 5')
     parser.add_argument('--run', type=str, default=1, help='run id')
 
     args = parser.parse_args()

@@ -229,38 +229,38 @@ def train_layoutLM(model, epochs, dataloader_train, dataloader_eval, optimizer, 
         loss.backward()
         optimizer.step()
         global_step += 1
+        if global_step % int(750 / batch_size) == 0:
+          print(f"Loss after {global_step} steps: {loss.item()}")    
+          eval_results = do_eval(model, dataloader_eval) 
+          current_loss = eval_results['eval_loss']
+          #implementing early stopping
+          if current_loss > last_loss:
+              trigger_times += 1
+              print(f'Validation loss did not decrease from {last_loss}.')
+              print('Trigger Times:', trigger_times)
 
-      print(f"Loss after {epoch} epoch: {loss.item()}")    
-      eval_results = do_eval(model, dataloader_eval) 
-      current_loss = eval_results['eval_loss']
-      #implementing early stopping
-      if current_loss > last_loss:
-          trigger_times += 1
-          print(f'Validation loss did not decrease from {last_loss}.')
-          print('Trigger Times:', trigger_times)
+              if trigger_times >= patience:
+                  print(f'Early stopping because validation loss did not decrease after {trigger_times} epochs.')
+                  print(f'Returning best model named: {best_model}')
+                  best_model = torch.load(best_model)
+                  df = pd.DataFrame(final_results)
+                  df.to_csv(f'results/v3/log_layoutLMv3_kleister-nda_seglevel_run{run}.csv', index = False)
+                  return best_model
 
-          if trigger_times >= patience:
-              print(f'Early stopping because validation loss did not decrease after {trigger_times} epochs.')
-              print(f'Returning best model named: {best_model}')
-              best_model = torch.load(best_model)
-              df = pd.DataFrame(final_results)
-              df.to_csv(f'results/v3/log_layoutLMv3_kleister-nda_seglevel_run{run}.csv', index = False)
-              return best_model
+          else:
+              print(f'Validation loss decresed. Saving checkpoint...')
+              best_model = f'models/checkpointLMv3_epoch{epoch}.pt'
+              for ckpt in os.listdir('models'):
+                  if 'checkpointLMv3_epoch' in ckpt:
+                      os.remove(f'models/{ckpt}') #avoid too many checkpoints
+              torch.save(model, best_model)
+              trigger_times = 0
+              last_loss = current_loss
 
-      else:
-          print(f'Validation loss decresed. Saving checkpoint...')
-          best_model = f'models/checkpointLMv3_epoch{epoch}.pt'
-          for ckpt in os.listdir('models'):
-              if 'checkpointLMv3_epoch' in ckpt:
-                  os.remove(f'models/{ckpt}') #avoid too many checkpoints
-          torch.save(model, best_model)
-          trigger_times = 0
-          last_loss = current_loss
-
-      tmp = eval_results
-      tmp['epoch'] =  global_step
-      tmp['train_loss'] =  loss.item()
-      final_results.append(tmp)
+          tmp = eval_results
+          tmp['epoch'] =  global_step
+          tmp['train_loss'] =  loss.item()
+          final_results.append(tmp)
   df = pd.DataFrame(final_results)
   df.to_csv(f'results/v3/log_layoutLMv3_kleister-nda_seglevel_run{run}.csv', index = False)
   best_model = torch.load(best_model)

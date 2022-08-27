@@ -167,7 +167,7 @@ def inference(img, annotation):
   font = ImageFont.load_default()
 
   label2color = {'term':'blue', 'party':'green', 'effective_date':'orange', 'jurisdiction':'violet', 'o': 'grey'}
-
+  print([(tokenizer.decode([id]), iob_to_label(label_map[label]).lower()) for id, label in zip(new_words, word_level_predictions) if label != 12 ])
   for prediction, box in zip(word_level_predictions, final_boxes):
       predicted_label = iob_to_label(label_map[prediction]).lower()
       if predicted_label != 'o':
@@ -186,4 +186,3 @@ if __name__ == '__main__':
     inference(args.image, args.annotation)
     end = time.time()
     print(f'time: {end - start}')
-    inference(args.image, args.annotation)

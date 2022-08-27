@@ -11,7 +11,7 @@ import torch
 import time
 import argparse
 
-processor = LayoutLMv3Processor.from_pretrained("microsoft/layoutlmv3-base", apply_ocr=False)
+processor = LayoutLMv3Processor.from_pretrained("microsoft/layoutlmv3-base", apply_ocr=True)
 
 def get_labels(path):
     with open(path, "r") as f:
@@ -70,8 +70,8 @@ def inference(img, annotation):
     for box in actual_boxes:
         boxes.append(normalize_box(box, width, height))
     
-    encoded_inputs = processor(image, words, boxes=boxes,
-                   padding="max_length", truncation=True, return_tensors="pt")
+    encoded_inputs = processor(image,
+                               padding="max_length", truncation=True, return_tensors="pt")
     for k,v in encoded_inputs.items():
         encoded_inputs[k] = v.to(device)
 
@@ -109,4 +109,3 @@ if __name__ == '__main__':
     inference(args.image, args.annotation)
     end = time.time()
     print(f'time: {end - start}')
-    inference(args.image, args.annotation)

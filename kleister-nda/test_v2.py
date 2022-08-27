@@ -231,4 +231,4 @@ if __name__ == '__main__':
     print('Evaluating on the test split...')
     test = do_eval_pred(model, pred_dataloader, device)
     df = pd.DataFrame([test])
-    df.to_csv('results/LayoutLMv2_kleister-nda-TEST_run{run}.csv', index=False)
+    df.to_csv(f'results/v2/LayoutLMv2_kleister-nda-TEST_run{args.run}.csv', index=False)
