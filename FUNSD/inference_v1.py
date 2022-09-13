@@ -184,4 +184,3 @@ if __name__ == '__main__':
     inference(args.image, args.annotation)
     end = time.time()
     print(f'time: {end - start}')
-    inference(args.image, args.annotation)

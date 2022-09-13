@@ -96,7 +96,7 @@ def inference(img, annotation):
 
     for box in actual_boxes:
         boxes.append(normalize_box(box, width, height))
-    
+
     encoded_inputs = processor(image, words, boxes=boxes,
                    padding="max_length", truncation=True, return_tensors="pt")
     for k,v in encoded_inputs.items():
@@ -109,21 +109,22 @@ def inference(img, annotation):
     token_words = encoded_inputs.input_ids.squeeze().tolist()
 
     width, height = image.size
-
+    print(len(predictions), len(token_boxes))
     true_predictions = [id2label[prediction] for prediction in predictions]
     true_boxes = [unnormalize_box(box, width, height) for box in token_boxes]
     draw = ImageDraw.Draw(image)
-    
+    print(len(true_predictions), len(true_boxes))
+    print(true_predictions)
     font = ImageFont.load_default()
 
     label2color = {'question':'blue', 'answer':'green', 'header':'orange', 'o':'violet'}
 
-
+    
     for prediction, box in zip(true_predictions, true_boxes):
         predicted_label = iob_to_label(prediction[2:])
         draw.rectangle(box, outline=label2color[predicted_label.lower()])
         draw.text((box[0] + 10, box[1] - 10), text=predicted_label, fill=label2color[predicted_label.lower()], font=font)
-        image.save(f'predictionV3_{img.split("/")[-1]}')
+    image.save(f'predictionV3_{img.split("/")[-1]}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='''inference with LayoutLMv3 finetuned on FUNSD''')
@@ -135,4 +136,3 @@ if __name__ == '__main__':
     inference(args.image, args.annotation)
     end = time.time()
     print(f'time: {end - start}')
-    inference(args.image, args.annotation)

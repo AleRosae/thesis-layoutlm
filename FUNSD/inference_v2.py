@@ -94,7 +94,7 @@ def inference(img, annotation):
         predicted_label = iob_to_label(prediction[2:])
         draw.rectangle(box, outline=label2color[predicted_label.lower()])
         draw.text((box[0] + 10, box[1] - 10), text=predicted_label, fill=label2color[predicted_label.lower()], font=font)
-        image.save(f'predictionV2_{img.split("/")[-1]}')
+    image.save(f'predictionV2_{img.split("/")[-1]}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='''inference with LayoutLMv2 finetuned on FUNSD''')
